@@ -7,7 +7,7 @@ from kiss.models import DBSession
 from kiss.models.models import MyModel
 
 
-@view_config(route_name='home', renderer='../templates/mytemplate.pt')
+@view_config(route_name='home', renderer='templates/mytemplate.pt')
 def my_view(request):
     try:
         one = DBSession.query(MyModel).filter(MyModel.name == 'one').first()
