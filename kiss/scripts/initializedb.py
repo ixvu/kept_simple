@@ -16,6 +16,7 @@ from ..models import (
     Base,
     )
 from ..models.models import MyModel
+from ..models.users import User,AuthenticatedUser
 
 
 def usage(argv):
@@ -35,6 +36,6 @@ def main(argv=sys.argv):
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
-    with transaction.manager:
-        model = MyModel(name='one', value=1)
-        DBSession.add(model)
+    # with transaction.manager:
+    #     model = MyModel(name='one', value=1)
+    #     DBSession.add(model)
