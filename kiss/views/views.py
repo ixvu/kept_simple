@@ -5,7 +5,8 @@ from sqlalchemy.exc import DBAPIError
 
 from kiss.models import DBSession
 from kiss.models.models import MyModel
-
+import json
+import codecs
 
 conn_err_msg = """\
 Pyramid is having a problem using your SQL database.  The problem
@@ -23,6 +24,7 @@ After you fix the problem, please restart the Pyramid application to
 try it again.
 """
 
+
 @view_config(route_name='home', renderer='templates/base.html.jinja2')
 def my_view(request):
     try:
@@ -31,9 +33,20 @@ def my_view(request):
         return Response(conn_err_msg, content_type='text/plain', status_int=500)
     return {'one': one, 'project': 'kiss'}
 
+
 @view_config(route_name='verify', renderer='templates/verify.html.jinja2')
 def verify(request):
-	return {'one': 1, 'project': 'kiss'}
+    return {'one': 1, 'project': 'kiss'}
 
 
-
+@view_config(route_name='create', renderer='templates/create.html.jinja2')
+def create(request):
+    if request.method == 'POST':
+        reader = codecs.getreader("utf-8")
+        filename = request.POST['json-export'].filename
+        input_file = request.POST['json-export'].file
+        data = json.load(reader(input_file))
+        size = len(data)
+        return {'one': 1, 'project': 'kiss', 'name': filename, 'size':size}
+    else:
+        return {'one': 1, 'project': 'kiss'}
