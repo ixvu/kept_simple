@@ -1,0 +1,30 @@
+{% extends "base.html.jinja2" %} {% block content %}
+<div class="pure-g create-form">
+    <div class="pure-u-lg-1-3"></div>
+    <div class="pure-u-1 pure-u-lg-1-3">
+        <form class="pure-form pure-form-aligned" action="/create" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+            <fieldset>
+                <div class="pure-control-group">
+                    <label for="name">Task Name</label>
+                    <input id="name" name="task-name" class="pure-input-2-3" type="text" placeholder="Task name">
+                </div>
+                <div class="pure-control-group">
+                    <label for="model-version">Classification Model Version</label>
+                    <input id="model-version" name="model-version" class="pure-input-2-3" type="text" placeholder="enter git hash">
+                </div>
+                <div class="pure-control-group">
+                    <label for="model-s3-path">Trained Model location</label>
+                    <input id="model-s3-path" name="model-s3-path" class="pure-input-2-3" type="text" placeholder="S3 path of trained model">
+                </div>
+                <div class="pure-control-group">
+                    <label for="json-export">Experiement Json</label>
+                    <input id="json-export" name="json-export" class="pure-input-2-3" type="file" placeholder="upload json">
+                </div>
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button pure-button-primary">Save</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+{% endblock %}
