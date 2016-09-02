@@ -1,17 +1,13 @@
+import codecs
+import json
+
 from authomatic.adapters import WebObAdapter
+from kiss.models.users import User
 from pyramid.httpexceptions import HTTPFound
-from pyramid.response import Response
 from pyramid.security import remember, forget
 from pyramid.view import view_config
+
 from ..authomaic_config import authomatic
-
-from sqlalchemy.exc import DBAPIError
-
-from kiss.models import DBSession
-from kiss.models.models import MyModel
-from kiss.models.users import User
-import json
-import codecs
 
 conn_err_msg = """\
 Pyramid is having a problem using your SQL database.  The problem
@@ -30,16 +26,7 @@ try it again.
 """
 
 
-@view_config(route_name='home', renderer='templates/base.html.jinja2')
-def my_view(request):
-    try:
-        one = DBSession.query(MyModel).filter(MyModel.name == 'one').first()
-    except DBAPIError:
-        return Response(conn_err_msg, content_type='text/plain', status_int=500)
-    return {'one': one, 'project': 'kiss'}
-
-
-@view_config(route_name='verify', renderer='templates/verify.html.jinja2')
+@view_config(route_name='home', renderer='templates/verify.html.jinja2')
 def verify(request):
     return {'one': 1, 'project': 'kiss'}
 
@@ -52,7 +39,7 @@ def create(request):
         input_file = request.POST['json-export'].file
         data = json.load(reader(input_file))
         size = len(data)
-        return {'one': 1, 'project': 'kiss', 'name': filename, 'size':size}
+        return {'one': 1, 'project': 'kiss', 'name': filename, 'size': size}
     else:
         return {'one': 1, 'project': 'kiss'}
 
@@ -72,7 +59,8 @@ def google_login(request):
     if result and result.user.credentials:
         # get fb authenticated user
         result.user.update()
-        user = User.register_user(result.user.id,result.user.name,result.user.credentials.token,result.user.email)# Generate auth token
+        user = User.register_user(result.user.id, result.user.name, result.user.credentials.token,
+                                  result.user.email)  # Generate auth token
         auth_tkt = User._get_auth_tkt(user)
         header = remember(request, auth_tkt)
         # Add auth token headers to response
@@ -80,6 +68,7 @@ def google_login(request):
         [header_list.append(auth_header) for auth_header in header]
         response._headerlist__set(header_list)
     return response
+
 
 @view_config(route_name='logout')
 def logout(request):
@@ -91,4 +80,4 @@ def logout(request):
     headers = forget(request)
     auth_tkt = request.authenticated_userid
     User.expire_auth_tkt(auth_tkt)
-    return HTTPFound(headers=headers,location=request.route_url("home_page"))
+    return HTTPFound(headers=headers, location=request.route_url("home_page"))

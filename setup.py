@@ -18,7 +18,9 @@ requires = [
     'transaction',
     'zope.sqlalchemy',
     'waitress',
-    'authomatic'
+    'authomatic',
+    'docopt',
+    'pandas'
     ]
 
 setup(name='kiss',
