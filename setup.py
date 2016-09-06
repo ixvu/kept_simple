@@ -20,7 +20,7 @@ requires = [
     'waitress',
     'authomatic',
     'docopt',
-    'pandas'
+    'pandas', 'cornice'
     ]
 
 setup(name='kiss',

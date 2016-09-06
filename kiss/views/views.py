@@ -6,24 +6,27 @@ from kiss.models.users import User
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember, forget
 from pyramid.view import view_config
-
+from kiss.models import DBSession
+from kiss.models.classification import ClassificationData
 from ..authomaic_config import authomatic
+from cornice import Service
 
-conn_err_msg = """\
-Pyramid is having a problem using your SQL database.  The problem
-might be caused by one of the following things:
+feed = Service(name='feed', path='/feed', description='feed')
 
-1.  You may need to run the "initialize_kiss_db" script
-    to initialize your database tables.  Check your virtual
-    environment's "bin" directory for this script and try to run it.
 
-2.  Your database server may not be running.  Check that the
-    database server referred to by the "sqlalchemy.url" setting in
-    your "development.ini" file is running.
-
-After you fix the problem, please restart the Pyramid application to
-try it again.
-"""
+@feed.get()
+def get_feed(request):
+    data = []
+    for rec in DBSession.query(ClassificationData).limit(10).all():
+        product = {}
+        product['url'] = rec.url
+        product['title'] = rec.title
+        product['breadcrumb'] = rec.breadcrumb
+        product['categorypath1'] = rec.categorypath1
+        product['categorypath2'] = rec.categorypath2
+        product['pentos_id'] = rec.pentos_id
+        data.append(product)
+    return data
 
 
 @view_config(route_name='home', renderer='templates/verify.html.jinja2')
