@@ -28,8 +28,12 @@ def get_feed(request):
         data.append(product)
     return data
 
+@view_config(route_name='home', renderer='templates/index.html.jinja2')
+def home_page(request):
+    user = User.get_user_from_auth_tkt(request.authenticated_userid)
+    return {'user': user}
 
-@view_config(route_name='home', renderer='templates/verify.html.jinja2')
+@view_config(route_name='verify', renderer='templates/verify.html.jinja2')
 def verify(request):
     return {'one': 1, 'project': 'kiss'}
 

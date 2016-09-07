@@ -2,7 +2,7 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-  entry: path.resolve(__dirname,'modules','App.js'),
+  entry: path.resolve(__dirname,'src','index.js'),
   output: {
     filename: 'build/browser-bundle.js',
     publicPath: '/static/'
@@ -17,7 +17,7 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
-        include: path.resolve(__dirname, 'modules'),
+        include: path.resolve(__dirname, 'src'),
         query: {
           presets: ['es2015', 'react'],
         }
@@ -26,7 +26,7 @@ module.exports = {
         test:/\.json$/,
         loader: 'json-loader',
         exclude: /node_modules/,
-        include: path.resolve(__dirname, 'modules')
+        include: path.resolve(__dirname, 'src')
       },
       {
         test: /\.css$/,
