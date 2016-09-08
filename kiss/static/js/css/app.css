@@ -1,0 +1,46 @@
+.container{
+	max-width: 100%;
+	width: 100%;
+}
+
+.no-list-style {
+    list-style: none;
+}
+
+.no-list-style  li{
+    display: inline;
+    margin-right: 10px;
+}
+
+.help-links {
+	margin-left: 80%;
+	margin-bottom: -1em;
+}
+
+.category-block{
+	padding-top: 3em;
+}
+
+.category-block li{
+	cursor: pointer;
+}
+
+.category-block ul{
+	list-style: none;
+	line-height: 2.5em;
+}
+
+.category-block .top-level {
+	font-size: 1.5em;
+	font-weight: 600;
+}
+
+.category-block li::before {
+    content: " → ";
+}
+
+.category-block li:hover:after {
+    content: " x ";
+    color: red;
+    font-size: 1.5em;
+}
