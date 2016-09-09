@@ -21,6 +21,10 @@
 	padding-top: 3em;
 }
 
+.category-block h5,.category-block li{
+	text-transform: capitalize;
+}
+
 .category-block li{
 	cursor: pointer;
 }
@@ -28,11 +32,12 @@
 .category-block ul{
 	list-style: none;
 	line-height: 2.5em;
+	min-height: 20em;
 }
 
 .category-block .top-level {
-	font-size: 1.5em;
-	font-weight: 600;
+	font-size: 1.2em;
+	font-weight: 500;
 }
 
 .category-block li:not(.top-level):before {
@@ -40,7 +45,7 @@
 }
 
 .category-block li:not(.error-level):hover, .error-level{
-	background: bisque;
+	background: #d2e5ea;
 }
 
 .category-block li:not(.error-level):hover:after,.error-level:after {
