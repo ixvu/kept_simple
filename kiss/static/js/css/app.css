@@ -35,12 +35,18 @@
 	font-weight: 600;
 }
 
-.category-block li::before {
+.category-block li:not(.top-level):before {
     content: " → ";
 }
 
-.category-block li:hover:after {
+.category-block li:not(.error-level):hover, .error-level{
+	background: bisque;
+}
+
+.category-block li:not(.error-level):hover:after,.error-level:after {
     content: " x ";
     color: red;
-    font-size: 1.5em;
+    font-size: 1.2em;
+    float: right;
+    margin-right: 1em;
 }
