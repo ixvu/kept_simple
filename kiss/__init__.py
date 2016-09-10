@@ -6,7 +6,10 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from .models import (
     DBSession,
     Base,
-    )
+)
+
+from .models.users import User, AuthenticatedUser
+from .models.classification import ClassificationData
 
 
 def main(global_config, **settings):
@@ -20,12 +23,14 @@ def main(global_config, **settings):
     authnpolicy = AuthTktAuthenticationPolicy('seekrit', hashalg='sha512')
     authzpolicy = ACLAuthorizationPolicy()
 
-    config = Configurator(settings=settings)
+    config = Configurator(settings=settings, authentication_policy=authnpolicy, authorization_policy=authzpolicy)
     config.include('pyramid_jinja2')
+    config.include('cornice')
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
-    config.add_route('verify', '/verify')
+    config.add_route('verify','/verify')
     config.add_route('create', '/create')
     config.add_route('google_login', '/login/google')
+    config.add_route('logout', '/logout')
     config.scan()
     return config.make_wsgi_app()

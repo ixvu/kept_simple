@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title> Keep it simple </title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+{% if not user %}
+<a class='large button sites-button' href="/login/google"> Login using Google </a>
+{% endif %}
+{% if user %}
+<div id=app></div>
+<script src="static/js/build/browser-bundle.js"></script>
+{% endif %}
+</body>

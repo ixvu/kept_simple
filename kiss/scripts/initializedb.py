@@ -1,22 +1,17 @@
 import os
 import sys
-import transaction
-
-from sqlalchemy import engine_from_config
 
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
     )
-
 from pyramid.scripts.common import parse_vars
+from sqlalchemy import engine_from_config
 
 from ..models import (
     DBSession,
     Base,
     )
-from ..models.models import MyModel
-from ..models.users import User,AuthenticatedUser
 
 
 def usage(argv):
