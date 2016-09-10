@@ -1,5 +1,6 @@
 import React from 'react'
 import 'script!jquery';
+import 'script!jquery.hotkeys'
 require('skeleton-css/css/normalize.css')
 require('skeleton-css/css/skeleton.css')
 require('../../css/app.css')
@@ -10,7 +11,7 @@ var diff = require('json!../diff.json');
 export default React.createClass({
   getInitialState() {
       return {
-          'currentIndex' : 0  
+          'currentIndex' : 0,
       };
   },
   getDefaultProps() {
@@ -24,8 +25,19 @@ export default React.createClass({
   navigateTo(event){
   	 event.preventDefault();
   	 let newIndex = parseInt(event.target.attributes['data-new-index'].value);
-  	 this.setState({'currentIndex': newIndex});
-  	 this.setMarkings();
+     this.setIndex(newIndex);
+  },
+  setIndex(index){
+     this.setState({'currentIndex': index});
+     this.setMarkings();
+  },
+  getPrevIndex(){
+    let prevIndex = this.state.currentIndex == 0 ? 0 : this.state.currentIndex - 1;
+    return prevIndex;
+  },
+  getNextIndex(){
+    let nextIndex = this.state.currentIndex == this.props.records.length -1 ? this.state.currentIndex : this.state.currentIndex + 1;
+    return nextIndex;
   },
   renderLevel(level,pos,name,id){
 		if (pos == 0){
@@ -80,13 +92,17 @@ export default React.createClass({
   	$(event.target).addClass("error-level");
   	this.saveMisclassification(id,categoryName,errorLevel);
   },
+  componentDidMount() {
+    $(document).bind("keydown", "alt+l", () => this.setIndex(this.getNextIndex()));
+    $(document).bind("keydown", "alt+h", () => this.setIndex(this.getPrevIndex()));
+  },
   render() {
   	let item = this.props.records[this.state.currentIndex]
   	let amazonSearchLink = "https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias%3Daps&field-keywords="+item.title
-  	let prevIndex = this.state.currentIndex == 0 ? 0 : this.state.currentIndex - 1;
-  	let nextIndex = this.state.currentIndex == this.props.records.length -1 ? this.state.currentIndex : this.state.currentIndex + 1;
-  	let category_1 = item.category_1
-  	let category_2 = item.category_2
+  	let prevIndex = this.getPrevIndex();
+    let nextIndex = this.getNextIndex();
+    let category_1 = item.category_1;
+  	let category_2 = item.category_2;
     return (
     <div className="container">
         <div className="row">
