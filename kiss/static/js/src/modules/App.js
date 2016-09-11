@@ -93,8 +93,26 @@ export default React.createClass({
   	this.saveMisclassification(id,categoryName,errorLevel);
   },
   componentDidMount() {
-    $(document).bind("keydown", "alt+l", () => this.setIndex(this.getNextIndex()));
-    $(document).bind("keydown", "alt+h", () => this.setIndex(this.getPrevIndex()));
+    $(document).bind("keydown", "right", () => this.setIndex(this.getNextIndex()));
+    $(document).bind("keydown", "left", () => this.setIndex(this.getPrevIndex()));
+    /* binding keys for annotating category 1 */
+    $(document).bind("keydown","shift+a",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="0"]').click());
+    $(document).bind("keydown","shift+s",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="1"]').click());
+    $(document).bind("keydown","shift+d",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="2"]').click());
+    $(document).bind("keydown","shift+f",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="3"]').click());
+    $(document).bind("keydown","shift+g",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="4"]').click());
+    $(document).bind("keydown","shift+h",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="5"]').click());
+    $(document).bind("keydown","shift+j",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="6"]').click());
+    $(document).bind("keydown","shift+z",()=>$('.category-block button[data-cat-name="category-1"]').click());
+    /* binding keys for annotating category 2 */
+    $(document).bind("keydown","shift+q",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="0"]').click());
+    $(document).bind("keydown","shift+w",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="1"]').click());
+    $(document).bind("keydown","shift+e",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="2"]').click());
+    $(document).bind("keydown","shift+r",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="3"]').click());
+    $(document).bind("keydown","shift+t",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="4"]').click());
+    $(document).bind("keydown","shift+y",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="5"]').click());
+    $(document).bind("keydown","shift+u",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="6"]').click());
+    $(document).bind("keydown","shift+x",()=>$('.category-block button[data-cat-name="category-2"]').click());
   },
   render() {
   	let item = this.props.records[this.state.currentIndex]
