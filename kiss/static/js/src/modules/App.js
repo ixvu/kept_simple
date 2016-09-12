@@ -1,9 +1,10 @@
-import React from 'react'
+import React from 'react';
 import 'script!jquery';
-import 'script!jquery.hotkeys'
-require('skeleton-css/css/normalize.css')
-require('skeleton-css/css/skeleton.css')
-require('../../css/app.css')
+import 'script!jquery.hotkeys';
+require('skeleton-css/css/normalize.css');
+require('skeleton-css/css/skeleton.css');
+require('../../css/app.css');
+var update = require('react-addons-update');
 
 export default React.createClass({
   getInitialState() {
@@ -22,7 +23,7 @@ export default React.createClass({
   },
   setIndex(index){
      this.setState({'currentIndex': index});
-     this.setMarkings();
+     this.getAnnotations(this.state.records[index].id);
   },
   getPrevIndex(){
     let prevIndex = this.state.currentIndex == 0 ? 0 : this.state.currentIndex - 1;
@@ -51,7 +52,7 @@ export default React.createClass({
       </div>
       );
   },
-  setMarkings(category){
+  resetMarkings(category){
     if(category){
       $(".category-block li[data-category-id="+category+"]").removeClass("error-level");
       $(".category-block button[data-category-id="+category+"]").removeClass("button-primary")
@@ -73,7 +74,7 @@ export default React.createClass({
   annotate(event){
     let categoryId = event.target.attributes["data-category-id"].value;
     let id = event.target.attributes["data-record-id"].value;
-    this.setMarkings(categoryId);
+    this.resetMarkings(categoryId);
     if (event.target.classList.contains("button")){
 	    $(event.target).addClass("button-primary");
 	    this.saveAnnotation(id,categoryId,100);
@@ -83,8 +84,30 @@ export default React.createClass({
 	    this.saveAnnotation(id,categoryId,errorLevel);
     }
   },
+  getAnnotations(recordId){
+    $.get('/annotate', { record_id:recordId }, (data) => {
+        let newState = update(this.state,{annotations: { $set:data }});
+        this.setState(newState);
+        this.resetMarkings();
+        for (var i = 0; i < this.state.annotations.length; i++) {;
+          let current = this.state.annotations[i];
+          this.setAnnotation(current.category_path_id,current.annotation_id);
+        }
+    });
+  },
+  setAnnotation(categoryId,annotationId){
+    if (0 <= annotationId && annotationId <= 6){
+      $('.category-block li[data-cat-level="'+annotationId+'"][data-category-id="'+categoryId+'"]').addClass('error-level');
+    } else if (annotationId == 100){
+      $('.category-block button[data-category-id="'+categoryId+'"]').addClass('button-primary');
+    }
+
+  },
   componentDidMount() {
-    $.get('/feed', {}, (data) => this.setState({records: data, currentIndex: 0}) );
+    $.get('/feed', {}, (data) => {
+      this.setState({records: data, currentIndex: 0});
+      this.getAnnotations(data[0].id);
+      });
     $(document).bind("keydown", "right", () => this.setIndex(this.getNextIndex()));
     $(document).bind("keydown", "left", () => this.setIndex(this.getPrevIndex()));
     /* binding keys for annotating category 1 */
@@ -104,7 +127,7 @@ export default React.createClass({
     $(document).bind("keydown","shift+t",()=>$('.category-block li[data-category-id="2"][data-cat-level="4"]').click());
     $(document).bind("keydown","shift+y",()=>$('.category-block li[data-category-id="2"][data-cat-level="5"]').click());
     $(document).bind("keydown","shift+u",()=>$('.category-block li[data-category-id="2"][data-cat-level="6"]').click());
-    $(document).bind("keydown","shift+x",()=>$('.category-block button[data-cat-name="category-2"]').click());
+    $(document).bind("keydown","shift+x",()=>$('.category-block button[data-category-id="2"]').click());
   },
   render() {
     let item = this.state.records.length > 0 ? this.state.records[this.state.currentIndex] : null;
