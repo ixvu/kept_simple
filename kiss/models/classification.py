@@ -23,7 +23,8 @@ class ClassificationData(Base):
     categorypath1_error_level = Column(String)
     categorypath2_error_level = Column(String)
     answer = Column(String)
-    job_id = Column(Integer)
+    pentos_job_id = Column(Integer)
+    job_id = Column(Integer, ForeignKey("spot_checking_jobs.id"), nullable=False)
 
 
 class SpotCheckJob(Base):
@@ -38,9 +39,10 @@ class Annotation(Base):
     description = Column(String)
 
 
-class UserAnnotations(Base):
+class UserAnnotation(Base):
     __tablename__ = "user_annotations"
     user_id = Column(String(250), ForeignKey("users.user_id"), primary_key=True, nullable=False)
+    categorypath_id = Column(Integer, primary_key=True, nullable=False)
     record_id = Column(Integer, ForeignKey("classification_data.id"), primary_key=True, nullable=False)
-    error_status_id = Column(Integer, ForeignKey("annotations.id"), primary_key=True, nullable=False)
+    annotation_id = Column(Integer, ForeignKey("annotations.id"), primary_key=True, nullable=False)
     created_date = Column(DateTime)

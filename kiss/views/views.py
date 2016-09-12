@@ -7,11 +7,22 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember, forget
 from pyramid.view import view_config
 from kiss.models import DBSession
-from kiss.models.classification import ClassificationData
+from kiss.models.classification import ClassificationData, UserAnnotation
 from ..authomaic_config import authomatic
 from cornice import Service
+from datetime import datetime
+from sqlalchemy import and_
+from pyramid.httpexceptions import HTTPForbidden
 
 feed = Service(name='feed', path='/feed', description='feed')
+user_annotation = Service(name="annotate", path="/annotate", description="Api for storing user annotations")
+
+
+def validate_user(request):
+    user = User.get_user_from_auth_tkt(request.authenticated_userid)
+    if not user:
+        return HTTPForbidden({'status': 'error', 'message': 'login to continue'})
+    return user
 
 
 @feed.get()
@@ -25,13 +36,58 @@ def get_feed(request):
         product['categorypath1'] = rec.categorypath1
         product['categorypath2'] = rec.categorypath2
         product['pentos_id'] = rec.pentos_id
+        product['id'] = rec.id
+        product['job_id'] = rec.job_id
         data.append(product)
     return data
+
+
+@user_annotation.get()
+def get_user_annotation(request):
+    user = validate_user(request)
+    user_id = user.user_id
+    record_id = int(request.GET.get("record_id"))
+
+    annotations = []
+    for annotation in DBSession.query(UserAnnotation).filter(and_(UserAnnotation.user_id == user_id,
+                                                                  UserAnnotation.record_id == record_id)).all():
+        annotations.append({'record_id': annotation.record_id, 'category_path_id': annotation.categorypath_id,
+                            'annotation_id': annotation.annotation_id})
+    return annotations
+
+
+@user_annotation.post()
+def annotate(request):
+    user = validate_user(request)
+    user_id = user.user_id
+    category_path_id = int(request.POST.get("category_path_id"))
+    record_id = int(request.POST.get("record_id"))
+    annotation_id = int(request.POST.get("annotation_id"))
+    created_date = datetime.now()
+
+    annotation = DBSession.query(UserAnnotation).filter(
+        and_(UserAnnotation.user_id == user_id, UserAnnotation.record_id == record_id,
+             UserAnnotation.categorypath_id == category_path_id)).one_or_none()
+    if annotation:
+        annotation.annotation_id = annotation_id
+        annotation.created_date = created_date
+    else:
+        annotation = UserAnnotation(
+            user_id=user_id,
+            categorypath_id=category_path_id,
+            record_id=record_id,
+            annotation_id=annotation_id,
+            created_date=created_date
+        )
+    DBSession.merge(annotation)
+    return {'status': 'success'}
+
 
 @view_config(route_name='home', renderer='templates/index.html.jinja2')
 def home_page(request):
     user = User.get_user_from_auth_tkt(request.authenticated_userid)
     return {'user': user}
+
 
 @view_config(route_name='verify', renderer='templates/verify.html.jinja2')
 def verify(request):

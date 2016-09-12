@@ -32,80 +32,78 @@ export default React.createClass({
     let nextIndex = this.state.currentIndex == this.state.records.length -1 ? this.state.currentIndex : this.state.currentIndex + 1;
     return nextIndex;
   },
-  renderLevel(level,pos,name,id){
+  renderLevel(level,pos,name,id,categoryId){
     if (pos == 0){
-      return (<li className="top-level" data-cat-level={pos} data-cat-name={name} data-record-id={id} onClick={this.markAsMisclassified} > {level} </li>)
+      return (<li className="top-level" data-cat-level={pos} data-record-id={id} data-category-id={categoryId} onClick={this.annotate} > {level} </li>)
     } else {
-      return (<li data-cat-level={pos} data-cat-name={name} data-record-id={id} onClick={this.markAsMisclassified}> {level}  </li>)
+      return (<li data-cat-level={pos} data-record-id={id} data-record-id={id} data-category-id={categoryId} onClick={this.annotate}> {level}  </li>)
     }
   },
-  renderPath(path,name,id){
+  renderPath(path,name,id,categoryId){
     let levels = this.getLevels(path);
     return (
       <div className="category-block" >
         <h5> {name} </h5>
         <ul>
-          { levels.map( (item,pos) => this.renderLevel(item,pos,name,id)) }
+          { levels.map( (item,pos) => this.renderLevel(item,pos,name,id,categoryId)) }
         </ul>
-        <button className="button" data-cat-name={name} data-record-id={id} onClick={this.markAsCorrectlyClassified} > Correct </button>
+        <button className="button" data-record-id={id} data-category-id={categoryId} onClick={this.annotate} > Correct </button>
       </div>
       );
   },
   setMarkings(category){
     if(category){
-      $(".category-block li[data-cat-name="+category+"]").removeClass("error-level");
-      $(".category-block button[data-cat-name="+category+"]").removeClass("button-primary")
+      $(".category-block li[data-category-id="+category+"]").removeClass("error-level");
+      $(".category-block button[data-category-id="+category+"]").removeClass("button-primary")
     }else{
       $(".category-block li").removeClass("error-level");
       $(".category-block button").removeClass("button-primary")
     }
   },
-  saveCorrectClassification(id,categoryName){
+  saveAnnotation(recordId,categoryId,level){
     //TODO: replace with ajax request
-    setTimeout(
-      () => console.log("correctly classified:",id, categoryName),1000);
+     let data = {
+     			record_id: recordId,
+     			category_path_id: categoryId,
+     			annotation_id:level
+     		};
 
+     $.post('/annotate', data , () => console.log("Saved successfully",data));
   },
-  saveMisclassification(id,categoryName,level){
-    //TODO: replace with ajax request
-     setTimeout( () => console.log(categoryName,level,id),1000);
-  },
-  markAsCorrectlyClassified(event){
-    let id = event.target.attributes["data-record-id"].value
-    let categoryName = event.target.attributes["data-cat-name"].value
-    this.setMarkings(categoryName);
-    $(event.target).addClass("button-primary");
-    this.saveCorrectClassification(id,categoryName);
-  },
-  markAsMisclassified(event){
-    let categoryName = event.target.attributes["data-cat-name"].value
-    let errorLevel = event.target.attributes["data-cat-level"].value
-    let id = event.target.attributes["data-record-id"].value
-    this.setMarkings(categoryName);
-    $(event.target).addClass("error-level");
-    this.saveMisclassification(id,categoryName,errorLevel);
+  annotate(event){
+    let categoryId = event.target.attributes["data-category-id"].value;
+    let id = event.target.attributes["data-record-id"].value;
+    this.setMarkings(categoryId);
+    if (event.target.classList.contains("button")){
+	    $(event.target).addClass("button-primary");
+	    this.saveAnnotation(id,categoryId,100);
+    } else{
+	    let errorLevel = event.target.attributes["data-cat-level"].value;
+	    $(event.target).addClass("error-level");
+	    this.saveAnnotation(id,categoryId,errorLevel);
+    }
   },
   componentDidMount() {
     $.get('/feed', {}, (data) => this.setState({records: data, currentIndex: 0}) );
     $(document).bind("keydown", "right", () => this.setIndex(this.getNextIndex()));
     $(document).bind("keydown", "left", () => this.setIndex(this.getPrevIndex()));
     /* binding keys for annotating category 1 */
-    $(document).bind("keydown","shift+a",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="0"]').click());
-    $(document).bind("keydown","shift+s",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="1"]').click());
-    $(document).bind("keydown","shift+d",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="2"]').click());
-    $(document).bind("keydown","shift+f",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="3"]').click());
-    $(document).bind("keydown","shift+g",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="4"]').click());
-    $(document).bind("keydown","shift+h",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="5"]').click());
-    $(document).bind("keydown","shift+j",()=>$('.category-block li[data-cat-name="category-1"][data-cat-level="6"]').click());
-    $(document).bind("keydown","shift+z",()=>$('.category-block button[data-cat-name="category-1"]').click());
+    $(document).bind("keydown","shift+a",()=>$('.category-block li[data-category-id="1"][data-cat-level="0"]').click());
+    $(document).bind("keydown","shift+s",()=>$('.category-block li[data-category-id="1"][data-cat-level="1"]').click());
+    $(document).bind("keydown","shift+d",()=>$('.category-block li[data-category-id="1"][data-cat-level="2"]').click());
+    $(document).bind("keydown","shift+f",()=>$('.category-block li[data-category-id="1"][data-cat-level="3"]').click());
+    $(document).bind("keydown","shift+g",()=>$('.category-block li[data-category-id="1"][data-cat-level="4"]').click());
+    $(document).bind("keydown","shift+h",()=>$('.category-block li[data-category-id="1"][data-cat-level="5"]').click());
+    $(document).bind("keydown","shift+j",()=>$('.category-block li[data-category-id="1"][data-cat-level="6"]').click());
+    $(document).bind("keydown","shift+z",()=>$('.category-block button[data-category-id="1"]').click());
     /* binding keys for annotating category 2 */
-    $(document).bind("keydown","shift+q",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="0"]').click());
-    $(document).bind("keydown","shift+w",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="1"]').click());
-    $(document).bind("keydown","shift+e",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="2"]').click());
-    $(document).bind("keydown","shift+r",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="3"]').click());
-    $(document).bind("keydown","shift+t",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="4"]').click());
-    $(document).bind("keydown","shift+y",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="5"]').click());
-    $(document).bind("keydown","shift+u",()=>$('.category-block li[data-cat-name="category-2"][data-cat-level="6"]').click());
+    $(document).bind("keydown","shift+q",()=>$('.category-block li[data-category-id="2"][data-cat-level="0"]').click());
+    $(document).bind("keydown","shift+w",()=>$('.category-block li[data-category-id="2"][data-cat-level="1"]').click());
+    $(document).bind("keydown","shift+e",()=>$('.category-block li[data-category-id="2"][data-cat-level="2"]').click());
+    $(document).bind("keydown","shift+r",()=>$('.category-block li[data-category-id="2"][data-cat-level="3"]').click());
+    $(document).bind("keydown","shift+t",()=>$('.category-block li[data-category-id="2"][data-cat-level="4"]').click());
+    $(document).bind("keydown","shift+y",()=>$('.category-block li[data-category-id="2"][data-cat-level="5"]').click());
+    $(document).bind("keydown","shift+u",()=>$('.category-block li[data-category-id="2"][data-cat-level="6"]').click());
     $(document).bind("keydown","shift+x",()=>$('.category-block button[data-cat-name="category-2"]').click());
   },
   render() {
@@ -138,11 +136,10 @@ export default React.createClass({
               <img className="u-full-width" src="static/sample3.png"/>
             </div>
             <div className="two columns">
-              {/* TODO: change the currentIndex  to db / pentos_id */}
-              { this.renderPath(category_1,"category-1",this.state.currentIndex)}
+              { this.renderPath(category_1,"category-1",item.id,1)}
             </div>
             <div className="two columns">
-              { this.renderPath(category_2,"category-2",this.state.currentIndex)}
+              { this.renderPath(category_2,"category-2",item.id,2)}
             </div>
           </div>
       </div>

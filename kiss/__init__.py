@@ -13,7 +13,7 @@ from .models.classification import (
     ClassificationData,
     SpotCheckJob,
     Annotation,
-    UserAnnotations
+    UserAnnotation
 )
 
 
@@ -39,7 +39,7 @@ def main(global_config, **settings):
     config = Configurator(settings=settings, authentication_policy=authnpolicy, authorization_policy=authzpolicy)
     config.include('pyramid_jinja2')
     config.include('cornice')
-    config.add_static_view('static', 'static', cache_max_age=3600)
+    config.add_static_view('static', 'static', cache_max_age=0)
     config.add_route('home', '/')
     config.add_route('verify', '/verify')
     config.add_route('create', '/create')

@@ -1,11 +1,13 @@
 """ Spotcheck data loader
 
 Usage:
-load_data.py --input <input_data> [-p]
+load_data.py --input <input_data> --job <job_description> [-p] [-d]
 
--h --help                 show this
--i --input=<input_file>   input json should contain the attributes url,breadcrumbs,category_1
--p                        use pentos export decoder
+-h --help                   show this
+-i --input=<input_file>     input json should contain the attributes url,breadcrumbs,category_1
+-j --job=<job_description>  Description of the current spot checking job
+-p                          use pentos export decoder
+-d                          delete existing rows
 
 """
 
@@ -13,8 +15,10 @@ from docopt import docopt
 import logging
 import pandas as pd
 import re
+from kiss.models.classification import SpotCheckJob, ClassificationData
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine,func
+from sqlalchemy.orm import sessionmaker
 
 
 def extract_status(task_run):
@@ -32,7 +36,7 @@ def pentos_job_export_to_df(pentos_job_id, pentos_job_json):
 
     status = dq_exp.taskRuns.apply(lambda x: pd.Series(extract_status(x)))
     dq_job_info = task.join(status, how='inner')
-    dq_job_info['job_id'] = pentos_job_id
+    dq_job_info['pentos_job_id'] = pentos_job_id
     return dq_job_info
 
 
@@ -48,13 +52,30 @@ if __name__ == '__main__':
     arguments = docopt(__doc__, version='DiffGen 0.1')
     print(arguments)
 
+    engine = create_engine('postgresql+psycopg2://kiss:kiss@localhost:5432/postgres')
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
     input_file = arguments.get("--input")
     input_data = process_json(input_file)
 
-    input_data = input_data.rename(columns={'id':'pentos_id'})
+    job_desc = arguments.get("--job")
+    job = session.query(SpotCheckJob).filter(SpotCheckJob.description == job_desc).one_or_none()
+    if not job:
+        job = SpotCheckJob(description=job_desc)
+        session.add(job)
+        session.commit()
+    job_id = job.id
 
-    db_cols = ['pentos_id', 'question', 'title', 'url', 'breadcrumb', 'categorypath1', 'categorypath2', 'imageurl', 'answer', 'job_id']
+    delete_existing = arguments.get("-d")
+    if delete_existing:
+        row_count = session.query(ClassificationData).filter(ClassificationData.job_id == job_id).delete()
+        session.commit()
 
-    engine = create_engine('postgresql+psycopg2://kiss:kiss@localhost:5432/postgres')
+    input_data = input_data.rename(columns={'id': 'pentos_id'})
+    input_data['job_id'] = job_id
+
+    db_cols = ['pentos_id', 'question', 'title', 'url', 'breadcrumb', 'categorypath1', 'categorypath2', 'imageurl',
+               'answer', 'pentos_job_id', 'job_id']
 
     input_data[db_cols].to_sql('classification_data', engine, index=False, if_exists='append')
