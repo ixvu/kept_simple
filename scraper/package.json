@@ -1,0 +1,17 @@
+{
+  "name": "analyse_misclassifications",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "docopt": "^0.6.2",
+    "nightmare": "^2.6.1",
+    "vo": "^4.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
