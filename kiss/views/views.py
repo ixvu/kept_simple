@@ -29,7 +29,7 @@ def validate_user(request):
 def get_feed(request):
     data = []
     query = DBSession.query(ClassificationData)
-    include_404 = request.get("include_404")
+    include_404 = request.params.get("include_404")
     if not include_404:
         query = query.filter(ClassificationData.http_status != 404)
     for rec in query.all():

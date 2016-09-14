@@ -156,7 +156,7 @@ export default React.createClass({
           <div className="row">
             <div className="eight columns">
               <h5> {item.title} </h5>
-              <img className="u-full-width" src="static/sample3.png"/>
+              <img className="u-full-width" src={"static/spot_check_images/"+item.id+".png"}/>
             </div>
             <div className="two columns">
               { this.renderPath(category_1,"category-1",item.id,1)}
