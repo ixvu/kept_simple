@@ -29,19 +29,12 @@ def validate_user(request):
 def get_feed(request):
     data = []
     query = DBSession.query(ClassificationData)
-    include_404 = request.params.get("include_404")
-    if not include_404:
+    all_rows = request.params.get("all")
+    if not all_rows:
         query = query.filter(ClassificationData.http_status != 404)
     for rec in query.all():
-        product = {}
-        product['url'] = rec.url
-        product['title'] = rec.title
-        product['breadcrumb'] = rec.breadcrumb
-        product['categorypath1'] = rec.categorypath1
-        product['categorypath2'] = rec.categorypath2
-        product['pentos_id'] = rec.pentos_id
-        product['id'] = rec.id
-        product['job_id'] = rec.job_id
+        product = {'url': rec.url, 'title': rec.title, 'breadcrumb': rec.breadcrumb, 'categorypath1': rec.categorypath1,
+                   'categorypath2': rec.categorypath2, 'pentos_id': rec.pentos_id, 'id': rec.id, 'job_id': rec.job_id}
         data.append(product)
     return data
 
