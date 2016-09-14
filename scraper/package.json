@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "docopt": "^0.6.2",
+    "jsonfile": "^2.3.1",
     "nightmare": "^2.6.1",
     "vo": "^4.0.2"
   },

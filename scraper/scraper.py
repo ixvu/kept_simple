@@ -25,6 +25,7 @@ if __name__ == '__main__':
     logging.debug("The provided arguments are \n {}".format(arguments))
     input_file = arguments.get("--input")
     output = arguments.get("--output")
+    os.makedirs(output,exist_ok=True)
     tmp_ = output + "/.tmp"
     os.makedirs(tmp_, exist_ok=True)
     num_workers = int(arguments.get("--num_workers"))

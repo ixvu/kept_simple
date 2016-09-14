@@ -10,18 +10,19 @@ class Scraper {
 			height: 768
 		}
 		this.nightmare = Nightmare({ 
-			"show" : false, 
-			"gotoTimeout" : 20000,
+			"show" : true, 
+			"gotoTimeout" : 200,
 			"ignore-certificate-errors" : true })
 		.viewport(this.scrapingOptions.width,this.scrapingOptions.height)
 		.useragent("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0");
 	}	
 
-	scrape(url,path){
+	scrape(url,path,statuses){
 		console.log(url)
 		var screenShot = this.nightmare.goto(url)
 		.then((result) => {
 			console.log('Http-Staus',result.code);
+			statuses[url] = result.code;
 			this.nightmare
 			.wait('body')
 			.screenshot(path,this.scrapingOptions);
