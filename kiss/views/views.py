@@ -28,7 +28,7 @@ def validate_user(request):
 @feed.get()
 def get_feed(request):
     data = []
-    query = DBSession.query(ClassificationData)
+    query = DBSession.query(ClassificationData).filter(ClassificationData.job_id == 2)
     all_rows = request.params.get("all")
     if not all_rows:
         query = query.filter(ClassificationData.http_status != 404)

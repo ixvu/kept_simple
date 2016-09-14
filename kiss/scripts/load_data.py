@@ -57,7 +57,6 @@ if __name__ == '__main__':
     session = Session()
 
     input_file = arguments.get("--input")
-    input_data = process_json(input_file)
 
     job_desc = arguments.get("--job")
     job = session.query(SpotCheckJob).filter(SpotCheckJob.description == job_desc).one_or_none()
@@ -72,10 +71,18 @@ if __name__ == '__main__':
         row_count = session.query(ClassificationData).filter(ClassificationData.job_id == job_id).delete()
         session.commit()
 
-    input_data = input_data.rename(columns={'id': 'pentos_id'})
-    input_data['job_id'] = job_id
+    pentos_format = arguments.get("-p")
 
-    db_cols = ['pentos_id', 'question', 'title', 'url', 'breadcrumb', 'categorypath1', 'categorypath2', 'imageurl',
-               'answer', 'pentos_job_id', 'job_id']
+    if pentos_format:
+        input_data = process_json(input_file)
+        input_data = input_data.rename(columns={'id': 'pentos_id'})
+        input_data['job_id'] = job_id
 
-    input_data[db_cols].to_sql('classification_data', engine, index=False, if_exists='append')
+        db_cols = ['pentos_id', 'question', 'title', 'url', 'breadcrumb', 'categorypath1', 'categorypath2', 'imageurl',
+                   'answer', 'pentos_job_id', 'job_id']
+
+        input_data[db_cols].to_sql('classification_data', engine, index=False, if_exists='append')
+    else:
+        input_data = pd.read_json(input_file)
+        input_data['job_id'] = job_id
+        input_data.to_sql('classification_data', engine, index=False, if_exists='append')
