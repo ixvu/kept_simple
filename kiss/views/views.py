@@ -28,7 +28,11 @@ def validate_user(request):
 @feed.get()
 def get_feed(request):
     data = []
-    for rec in DBSession.query(ClassificationData).limit(10).all():
+    query = DBSession.query(ClassificationData)
+    include_404 = request.get("include_404")
+    if not include_404:
+        query = query.filter(ClassificationData.http_status != 404)
+    for rec in query.all():
         product = {}
         product['url'] = rec.url
         product['title'] = rec.title
