@@ -10,7 +10,7 @@ var options = docopt.docopt(doc, {version: '0.1.1rc'});
 console.log(options);
 
 scraper = new Scraper();
-var classificationRecords = require("./"+options["--input"])
+var classificationRecords = require(options["--input"])
 
 var run = function * () {
   for (var i = 0; i < classificationRecords.length; i++) {

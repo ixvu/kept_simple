@@ -10,7 +10,7 @@ class Scraper {
 			height: 768
 		}
 		this.nightmare = Nightmare({ 
-			"show" : true, 
+			"show" : false, 
 			"gotoTimeout" : 20000,
 			"ignore-certificate-errors" : true })
 		.viewport(this.scrapingOptions.width,this.scrapingOptions.height)
