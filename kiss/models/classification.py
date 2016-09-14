@@ -24,6 +24,7 @@ class ClassificationData(Base):
     categorypath2_error_level = Column(String)
     answer = Column(String)
     pentos_job_id = Column(Integer)
+    http_status = Column(Integer)
     job_id = Column(Integer, ForeignKey("spot_checking_jobs.id"), nullable=False)
 
 
