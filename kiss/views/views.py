@@ -7,7 +7,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember, forget
 from pyramid.view import view_config
 from kiss.models import DBSession
-from kiss.models.classification import ClassificationData, UserAnnotation
+from kiss.models.classification import ClassificationData, UserAnnotation, SpotCheckJob
 from ..authomaic_config import authomatic
 from cornice import Service
 from datetime import datetime
@@ -28,7 +28,8 @@ def validate_user(request):
 @feed.get()
 def get_feed(request):
     data = []
-    query = DBSession.query(ClassificationData).filter(ClassificationData.job_id == 2)
+    job_id = request.params.get('job_id')
+    query = DBSession.query(ClassificationData).filter(ClassificationData.job_id == int(job_id))
     all_rows = request.params.get("all")
     if not all_rows:
         query = query.filter(ClassificationData.http_status != 404)
@@ -79,29 +80,19 @@ def annotate(request):
     DBSession.merge(annotation)
     return {'status': 'success'}
 
+@view_config(route_name='spot_check',renderer='templates/spot_check.html.jinja2')
+def spot_check(request):
+    user = User.get_user_from_auth_tkt(request.authenticated_userid)
+    spot_check_job_id = request.params.get('id')
+    return {'user': user, 'job_id': spot_check_job_id}
 
 @view_config(route_name='home', renderer='templates/index.html.jinja2')
 def home_page(request):
     user = User.get_user_from_auth_tkt(request.authenticated_userid)
-    return {'user': user}
-
-
-@view_config(route_name='verify', renderer='templates/verify.html.jinja2')
-def verify(request):
-    return {'one': 1, 'project': 'kiss'}
-
-
-@view_config(route_name='create', renderer='templates/create.html.jinja2')
-def create(request):
-    if request.method == 'POST':
-        reader = codecs.getreader("utf-8")
-        filename = request.POST['json-export'].filename
-        input_file = request.POST['json-export'].file
-        data = json.load(reader(input_file))
-        size = len(data)
-        return {'one': 1, 'project': 'kiss', 'name': filename, 'size': size}
-    else:
-        return {'one': 1, 'project': 'kiss'}
+    spot_check_jobs = []
+    for job in DBSession.query(SpotCheckJob).all():
+        spot_check_jobs.append(job)
+    return {'user': user, 'spot_check_jobs':spot_check_jobs}
 
 
 @view_config(route_name='google_login')

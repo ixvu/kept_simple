@@ -104,7 +104,8 @@ export default React.createClass({
 
   },
   componentDidMount() {
-    $.get('/feed', {}, (data) => {
+    let job_id = $("#spot-check-app")[0].attributes["data-spot-check-job-id"].value;
+    $.get('/feed', {"job_id": job_id}, (data) => {
       this.setState({records: data, currentIndex: 0});
       this.getAnnotations(data[0].id);
       });
