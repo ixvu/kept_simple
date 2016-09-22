@@ -11,7 +11,7 @@ from kiss.models.classification import ClassificationData, UserAnnotation, SpotC
 from ..authomaic_config import authomatic
 from cornice import Service
 from datetime import datetime
-from sqlalchemy import and_
+from sqlalchemy import and_,exists
 from pyramid.httpexceptions import HTTPForbidden
 
 feed = Service(name='feed', path='/feed', description='feed')
@@ -29,10 +29,21 @@ def validate_user(request):
 def get_feed(request):
     data = []
     job_id = request.params.get('job_id')
+    only_unmarked = request.params.get('show_unmarked')
+    domain = request.params.get('domain')
+    record_id = request.params.get('record_id')
     query = DBSession.query(ClassificationData).filter(ClassificationData.job_id == int(job_id))
     all_rows = request.params.get("all")
     if not all_rows:
         query = query.filter(ClassificationData.http_status != 404)
+    if only_unmarked:
+        query = query.filter(~exists().where(UserAnnotation.record_id == ClassificationData.id))
+    if domain:
+        domain = '%'+domain+'%'
+        query = query.filter(ClassificationData.url.like(domain))
+    if record_id:
+        query = query.filter(ClassificationData.id == int(record_id))
+    query = query.order_by(ClassificationData.id)
     for rec in query.all():
         product = {'url': rec.url, 'title': rec.title, 'breadcrumb': rec.breadcrumb, 'categorypath1': rec.categorypath1,
                    'categorypath2': rec.categorypath2, 'pentos_id': rec.pentos_id, 'id': rec.id, 'job_id': rec.job_id}
@@ -84,7 +95,10 @@ def annotate(request):
 def spot_check(request):
     user = User.get_user_from_auth_tkt(request.authenticated_userid)
     spot_check_job_id = request.params.get('id')
-    return {'user': user, 'job_id': spot_check_job_id}
+    only_unmarked = request.params.get('show_unmarked')
+    domain = request.params.get('domain')
+    record_id = request.params.get('record_id')
+    return {'user': user, 'job_id': spot_check_job_id, 'domain':domain, 'only_unmarked':only_unmarked, 'record_id':record_id}
 
 @view_config(route_name='home', renderer='templates/index.html.jinja2')
 def home_page(request):

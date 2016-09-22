@@ -104,8 +104,22 @@ export default React.createClass({
 
   },
   componentDidMount() {
+    let options = {}
     let job_id = $("#spot-check-app")[0].attributes["data-spot-check-job-id"].value;
-    $.get('/feed', {"job_id": job_id}, (data) => {
+    options["job_id"] = job_id;
+    let domain = $("#spot-check-app")[0].attributes["data-domain"];
+    if (domain) {
+        options["domain"] = domain.value;
+    }
+    let record_id = $("#spot-check-app")[0].attributes["data-record-id"];
+    if (record_id) {
+        options["record_id"] = record_id.value;
+    }
+    let only_unmarked = $("#spot-check-app")[0].attributes["data-only-unmarked"];
+    if (only_unmarked) {
+        options[only_unmarked] = only_unmarked.value;
+    }
+    $.get('/feed', options, (data) => {
       this.setState({records: data, currentIndex: 0});
       this.getAnnotations(data[0].id);
       });

@@ -1,5 +1,10 @@
 {% extends "base.html.jinja2" %}
 {% block content %}
-<div id="spot-check-app" data-spot-check-job-id="{{job_id}}"></div>
+<div id="spot-check-app"
+        data-spot-check-job-id="{{job_id}}"
+        {{ 'data-domain='+domain if domain}}
+        {{ 'data-record-id='+record_id if record_id}}
+        {{ 'data-only-unmarked='+record_id if only_unmarked}}
+</div>
 <script src="static/js/build/browser-bundle.js"></script>
 {% endblock %}
