@@ -52,6 +52,46 @@ export default React.createClass({
       </div>
       );
   },
+  renderTopLevel(id){
+    let levels = {
+                    "113": "Baby Products",
+                    "100": "Computers & Accessories",
+                    "114": "Musical Instruments",
+                    "108": "Jewelry",
+                    "102": "Automotive",
+                    "101": "Sports & Outdoors",
+                    "119": "Furniture",
+                    "103": "Home & Kitchen",
+                    "105": "Clothing & Accessories",
+                    "107": "Electronics",
+                    "116": "Pet Supplies",
+                    "117": "Industrial & Scientific",
+                    "109": "Health & Personal Care",
+                    "10835": "Media",
+                    "120": "Video Games",
+                    "121": "Software",
+                    "118": "Shoes",
+                    "110": "Grocery & Gourmet Food",
+                    "112": "Arts, Crafts & Sewing",
+                    "10839": "Additional",
+                    "106": "Tools & Home Improvement",
+                    "104": "Office Products",
+                    "111": "Toys & Games",
+                    "115": "Patio, Lawn & Garden"
+                }; 
+      let paths = []
+      for ( let level in levels){
+        paths.push(<li data-category-id={level}  data-record-id={id} className="button" key={level}> {levels[level]} </li>)
+      }
+        return (
+        <div className="four columns">
+          <ul className="top-level-block" >
+            {paths}
+          </ul>
+        </div>
+        );
+
+    },
   resetMarkings(category){
     if(category){
       $(".category-block li[data-category-id="+category+"]").removeClass("error-level");
@@ -62,7 +102,6 @@ export default React.createClass({
     }
   },
   saveAnnotation(recordId,categoryId,level){
-    //TODO: replace with ajax request
      let data = {
      			record_id: recordId,
      			category_path_id: categoryId,
@@ -152,6 +191,24 @@ export default React.createClass({
       let nextIndex = this.getNextIndex();
       let category_1 = item.categorypath1;
       let category_2 = item.categorypath2;
+
+       let renderJob = function(jobType){
+        if (jobType == "classification"){
+            return (
+              <div>
+                <div className="two columns">
+                  { this.renderPath(category_1,"category-1",item.id,1)}
+                </div>
+                <div className="two columns">
+                  { this.renderPath(category_2,"category-2",item.id,2)}
+                </div> 
+              </div>
+            );
+        } else if (jobType == "top_level") {
+          return this.renderTopLevel(item.id);
+        }
+      }.bind(this);
+
       return (
       <div className="container">
           <div className="row">
@@ -173,12 +230,7 @@ export default React.createClass({
               <h5> {item.title} </h5>
               <img className="u-full-width" src={"static/spot_check_images/"+item.id+".png"}/>
             </div>
-            <div className="two columns">
-              { this.renderPath(category_1,"category-1",item.id,1)}
-            </div>
-            <div className="two columns">
-              { this.renderPath(category_2,"category-2",item.id,2)}
-            </div>
+            { renderJob(item.job_type) }
           </div>
       </div>
       )

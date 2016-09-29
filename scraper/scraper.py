@@ -14,7 +14,7 @@ import pandas as pd
 from docopt import docopt
 import logging
 import sys
-from subprocess import Popen, PIPE
+from subprocess import Popen, STDOUT
 import time
 import os
 import json
@@ -59,12 +59,13 @@ if __name__ == '__main__':
     for ix in range(0, num_records, num_parts):
         part_file = tmp_ + '/part_{}.json'.format(ix)
         status_file = tmp_ + '/status_{}.json'.format(ix)
+        log_file = tmp_ + '/run_{}.log'.format(ix)
         tmp_files.append(part_file)
         status_files.append(status_file)
         spot_check_data.iloc[ix:ix + num_parts].to_json(part_file, orient='records')
         sub_process = Popen(["node", "index.js", "--input", part_file, "--status", status_file, "--output", output],
-                            stdout=PIPE,
-                            stderr=PIPE)
+                            stdout=open(log_file,'w'),
+                            stderr=STDOUT)
         sub_processes.append(sub_process)
     logging.debug("launched {} workers".format(len(sub_processes)))
 

@@ -1,11 +1,12 @@
 """ Spotcheck data loader
 
 Usage:
-load_data.py --input <input_data> --job <job_description> [-p] [-d]
+load_data.py --input <input_data> --job <job_description> [-t -p -d]
 
 -h --help                   show this
 -i --input=<input_file>     input json should contain the attributes url,breadcrumbs,category_1
 -j --job=<job_description>  Description of the current spot checking job
+-t --type=<job_type>        Job type [default: classification]
 -p                          use pentos export decoder
 -d                          delete existing rows
 
@@ -59,9 +60,10 @@ if __name__ == '__main__':
     input_file = arguments.get("--input")
 
     job_desc = arguments.get("--job")
+    job_type = arguments.get("--type")
     job = session.query(SpotCheckJob).filter(SpotCheckJob.description == job_desc).one_or_none()
     if not job:
-        job = SpotCheckJob(description=job_desc)
+        job = SpotCheckJob(description=job_desc,job_type=job_type)
         session.add(job)
         session.commit()
     job_id = job.id
