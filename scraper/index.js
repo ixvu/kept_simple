@@ -26,12 +26,13 @@ var run = function * () {
   	let image = outPath+"/"+id+".png";
     yield scraper.scrape(id,url,image,statuses);
   }
+  console.log('wring status file');
   jsonfile.writeFileSync(statusFile,statuses);
   yield scraper.close();
 
 }
 vo(run)
-.then(out => console.log('out', out))
+.then(out => console.log('out', (out ? out :"done") ))
 .catch(e => {
 	console.log('error',e);
 });

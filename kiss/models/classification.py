@@ -28,6 +28,13 @@ class ClassificationData(Base):
     http_status = Column(Integer)
     job_id = Column(Integer, ForeignKey("spot_checking_jobs.id"), nullable=False)
 
+class DomainMetaData(Base):
+    __tablename__ = 'domain_metadata'
+    id = Column(Integer, primary_key=True)
+    domain = Column(String)
+    type = Column(String)
+    content = Column(String)
+
 class SpotCheckJob(Base):
     __tablename__ = "spot_checking_jobs"
     id = Column(Integer, primary_key=True)
